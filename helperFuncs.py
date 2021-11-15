@@ -90,6 +90,39 @@ def overlay_face(just_prev_face, just_prev_mask, frame, x, y, w, h):
     faceless_frame = cv2.bitwise_and(frame, frame, mask=not_face)
     combined_frame = cv2.bitwise_or(faceless_frame,prev_face_frame)
 
+
+    # TODO: We should try to feather / blur the edges of the face to make it seem more natural
+    # NOTE: Maybe we could do this by eroding the underlying noface mask?
+
     return combined_frame
 
-# def transform_face(face_box)
+def overlay_emoji(emoji, frame, x, y, w, h):
+    """
+    Overlays the emoji on the frame.
+
+    Inputs:
+        emoji: the emoji to overlay
+        frame: the frame to overlay the emoji on
+        x, y, w, h: the bounding box coordinates of the face
+
+    Returns: frame with emoji overlayed.
+    """
+
+    # Resize the emoji
+    resized_emoji = cv2.resize(emoji, (w,h))
+
+    # Set old face on the frame
+    frame_h, frame_w, frame_d = frame.shape
+    emoji_frame = np.zeros((frame_h, frame_w, frame_d), dtype=np.uint8)
+    emoji_frame[y:y+h, x:x+w, :] = resized_emoji
+
+    # Join frames
+    not_face = cv2.bitwise_not(cv2.cvtColor(emoji_frame, cv2.COLOR_BGR2GRAY))
+    not_face[not_face < 250] = 0
+    faceless_frame = cv2.bitwise_and(frame, frame, mask=not_face)
+    combined_frame = cv2.bitwise_or(faceless_frame, emoji_frame)
+
+    return combined_frame
+
+
+# plt.imshow(combined_frame); plt.show()
