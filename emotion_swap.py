@@ -21,7 +21,7 @@ for i in range(5): _ = fvs.read()
 
 
 # Now we ask for user input to collect emotions of faces
-emotions_in_use = [('h', 'happy'), ('s', 'sad'), ('a', 'angry'), ('d', 'disgust'), ('f', 'fear'), ('t', 'surprise'), ('n', 'neutral')]
+emotions_in_use = [('h', 'happy'), ('s', 'sad'), ('a', 'angry'), ('d', 'disgust'), ('f', 'fear'), ('x', 'surprise'), ('n', 'neutral')]
 face_emotions = {}
 for key, emotion in emotions_in_use:
     this_emotion_collected = False
@@ -82,8 +82,8 @@ while True:
 
             # Set emoji background as black bc opencv is weird
             emoji, alpha_layer = emoji[:,:,:3], emoji[:,:,3] 
-            # emoji[np.stack([alpha_layer]*3, axis = -1) == 0] = 0 # Make 3rd alpha cube to boolean index #WhyIsTobinLikeThis
-
+            emoji[np.stack([alpha_layer]*3, axis = -1) == 0] = 0 # Make 3rd alpha cube to boolean index #WhyIsTobinLikeThis
+        
             if emoji is None and debug:
                 print('Emoji not found')
 
