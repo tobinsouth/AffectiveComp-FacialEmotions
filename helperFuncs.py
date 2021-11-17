@@ -46,14 +46,14 @@ def get_facemask(frame):
 
 
     # if debug: # for when things get weird
-        #     # draw bounding box of the detected face
-        #     rect = patches.Rectangle((d.left(), d.top()), d.width(), d.height(), fill=False)
-        #     ax.add_patch(rect)
+    #         # draw bounding box of the detected face
+    #         rect = patches.Rectangle((d.left(), d.top()), d.width(), d.height(), fill=False)
+    #         ax.add_patch(rect)
 
-        #     # draw landmarks
-        #     ax.scatter([point.x for point in marks], [point.y for point in marks])
-        #     # for k, point in enumerate(marks):
-        #     #     ax.text(point.x, point.y, k)
+    #         # draw landmarks
+    #         ax.scatter([point.x for point in marks], [point.y for point in marks])
+    #         # for k, point in enumerate(marks):
+    #         #     ax.text(point.x, point.y, k)
     
 
 def overlay_face(just_prev_face, just_prev_mask, frame, x, y, w, h):
@@ -110,6 +110,9 @@ def overlay_emoji(emoji, frame, x, y, w, h):
 
     # Resize the emoji
     resized_emoji = cv2.resize(emoji, (w,h))
+    
+
+    # Set background to black
 
     # Set old face on the frame
     frame_h, frame_w, frame_d = frame.shape
