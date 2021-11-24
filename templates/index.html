@@ -1,14 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Display Webcam Stream</title>
+ 
+<style>
+/* #container {
+	margin: 0px auto;
+	width: 100%;
+	height: 100%;
+	border: 10px #333 solid;
+    background-color: white;
+} */
+#videoElement {
+	width: 100%;
+	height: 100%;
+	background-color: white;
+}
+#videoElement2 {
+	width: 100%;
+	height: 100%;
+	background-color: white;
+}
+#videoElement3 {
+	width: 100%;
+	height: 100%;
+	background-color: white;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+</style>
+</head>
+ 
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8  offset-lg-2">
-                <h3 class="mt-5">Ground Truth</h3>
-                <img src="https://127.0.0.1/video_feed" height="30%" width="40%">
-                <h3 class="mt-5">Emotion Lag</h3>
-                <img src="https://127.0.0.1/emotion_lag" height="30%" width="40%">
-                <h3 class="mt-5">Emotion Swap</h3>
-                <img src="https://127.0.0.1/emotion_swap" height="30%" width="40%">
-            </div>
+<div id="container">
+    <div class="row">
+        <div class="column">
+            <h3 class="mt-5">True Self</h3>
+            <video autoplay="true" id="videoElement">
+            </video>
+        </div>
+        <div class="column">
+            <h3 class="mt-5">Modified Self</h3>
+            <video autoplay="true" id="videoElement2">
+            </video>
+        </div>
+        <div class="column">
+            <h3 class="mt-5">Received Other</h3>
+            <video autoplay="true" id="videoElement3">
+            </video>
         </div>
     </div>
+</div>
+<script>
+var video = document.querySelector("#videoElement");
+
+if (navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      video.srcObject = stream;
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
+}
+
+var video2 = document.querySelector("#videoElement2");
+
+if (navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      video2.srcObject = stream;
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
+}
+
+var video3 = document.querySelector("#videoElement3");
+
+if (navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      video3.srcObject = stream;
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
+}
+
+</script>
 </body>
+</html>
