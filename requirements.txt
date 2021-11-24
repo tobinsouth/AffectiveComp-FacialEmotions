@@ -1,0 +1,16 @@
+imutils==0.5.4
+opencv-python==4.5.4.60
+numpy==1.21.4
+matplotlib
+dlib==19.22.1
+Flask
+flask-restx
+flask_cors
+Click==7.1.2
+gunicorn==19.9.0
+itsdangerous==2.0
+Jinja2==3.0
+MarkupSafe==2.0.0rc2
+Werkzeug==2.0.1
+python-dotenv
+camera

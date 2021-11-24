@@ -1,7 +1,8 @@
 shape_predictor_68_face_landmarks.dat
 tobin.jpg
 testing.py
+video_capture.py
 
 __pycache__
 .DS_Store
-
+.venv
