@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM m03geek/ffmpeg-opencv-dlib
 
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6 cmake -y
