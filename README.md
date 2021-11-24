@@ -11,8 +11,9 @@ Two key files currently:
 1) create virtual environment
 2) pip install -r requirements.txt
 
-# Deployment
+# Deployment Notes
 1) No environment variables needed (for now ... otherwise use dotenv and os)
 2) Procfile takes care of Heroku Deployment
-3) Push deploy branch to Heroku: '''git push heroku deploy:main'''
-4) App runs on https://ganemon.herokuapp.com/
+3) Dockerfile makes sure that deployment errors are resolved (especially w.r.t. OpenCV's cv2 Python library)
+4) Push deploy branch to Heroku: '''git push heroku deploy:main'''
+5) App runs on https://ganemon.herokuapp.com/
