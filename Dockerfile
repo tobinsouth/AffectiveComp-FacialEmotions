@@ -1,11 +1,5 @@
-FROM ffmpeg-opencv-dlib
-
-RUN apt-get update
-RUN apt-get install ffmpeg libsm6 libxext6 cmake -y
-
-COPY . /ganemon
-WORKDIR /ganemon
-
-RUN python3 -m pip install -r requirements.txt 
-
-ENTRYPOINT python app.py
+FROM jhonatans01/python-dlib-opencv
+COPY . /app
+WORKDIR /app
+RUN pip3 install -r requirements.txt
+CMD ["python3", "app.py"]

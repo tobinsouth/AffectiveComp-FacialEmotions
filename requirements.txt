@@ -10,6 +10,6 @@ Werkzeug==2.0.1
 python-dotenv
 numpy==1.21.4
 matplotlib
-dlib==19.22.1
-imutils==0.5.4
+imutils==0.5.3
 opencv-python==4.5.4.60
+Dlib==19.21.1
