@@ -14,4 +14,5 @@ Two key files currently:
 # Deployment
 1) No environment variables needed (for now ... otherwise use dotenv and os)
 2) Procfile takes care of Heroku Deployment
-3) App runs on https://ganemon.herokuapp.com/
+3) Push deploy branch to Heroku: '''git push heroku deploy:main'''
+4) App runs on https://ganemon.herokuapp.com/
