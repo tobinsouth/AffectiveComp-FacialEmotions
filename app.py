@@ -1,13 +1,24 @@
 from flask import Flask, jsonify, request, render_template, Response
 from flask_cors import CORS
 from imutils.video import VideoStream
+from io import StringIO, BytesIO
+from PIL import Image
+from flask_socketio import SocketIO
+import base64
+import numpy as np
 import imutils
 import cv2
 import os
-# import socketio
+import socketio
 
 app = Flask(__name__)
+# CORS(app)
+
 CORS(app, resources=r'/api/*')
+# sio = socketio.Server()
+# sio.attach(app)
+sio = SocketIO(app)
+
 fvc = VideoStream().start()
 
 @app.route('/api/health')
@@ -46,14 +57,31 @@ def emotion_swap():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+@app.route('/yeaboi', methods=["GET","POST"])
+def whatever():
+    if request.method=="GET":
+        print(request.args.get('EIO'))
+        print(request.args.get('transport'))
+        print(request.args.get('t'))
+        return
 
-# @socketio.on('image')
+
+@sio.on('message')
+async def print_message(sid, message):
+    print("Socket ID: ", sid)
+    print(message)
+
+# @sio.event
+# def connect(sid, environ, auth):
+#     print('connect ', sid)
+
+# @sio.on('image')
 # def image(data_image):
 #     sbuf = StringIO()
 #     sbuf.write(data_image)
 
 #     # decode and convert into image
-#     b = io.BytesIO(base64.b64decode(data_image))
+#     b = BytesIO(base64.b64decode(data_image))
 #     pimg = Image.open(b)
 
 #     ## converting RGB to BGR, as opencv standards
@@ -69,11 +97,13 @@ def emotion_swap():
 #     b64_src = 'data:image/jpg;base64,'
 #     stringData = b64_src + stringData
 
-#     # emit the frame back
-#     emit('response_back', stringData)
+#     # # emit the frame back
+#     socketio.emit('response_back', stringData)
 
 
 if __name__ == '__main__':
     # app.run(debug=True)
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    sio.run(app)
+
+    # port = int(os.environ.get("PORT", 5000))
+    # app.run(host='0.0.0.0', port=port)

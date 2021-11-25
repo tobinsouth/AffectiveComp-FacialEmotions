@@ -49,11 +49,24 @@
             <video autoplay="true" id="videoElement">
             </video>
         </div>
+
+
         <div class="column">
             <h3 class="mt-5">Modified Self</h3>
-            <video autoplay="true" id="videoElement2">
-            </video>
+            <!-- <video autoplay="true" id="videoElement2">
+            </video> -->
+
+            <div id="container2">
+                <canvas id="canvasOutput"></canvas>
+                <video autoplay="true" id="videoElement2"></video>
+            </div>
+            
+            <div class = 'video'>
+                <img id="image">
+            </div>
         </div>
+
+
         <div class="column">
             <h3 class="mt-5">Received Other</h3>
             <video autoplay="true" id="videoElement3">
@@ -61,7 +74,20 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script src="https://docs.opencv.org/master/opencv.js" type="text/javascript"></script>
+
+
 <script>
+
+var socket = io("https://localhost:5000/yeaboi"); // This line determines the path of the manager (/socket.io./...)
+socket.on('connect', function(){
+    console.log("Connected...!", socket.connected);
+    socket.emit("message", {data: "YEAH BOI"});
+});
+
+
 var video = document.querySelector("#videoElement");
 
 if (navigator.mediaDevices.getUserMedia) {
@@ -80,11 +106,32 @@ if (navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices.getUserMedia({ video: true })
     .then(function (stream) {
       video2.srcObject = stream;
+      video2.play()
     })
     .catch(function (err0r) {
       console.log("Something went wrong!");
     });
 }
+
+
+// let src = new cv.Mat(video2.height, video2.width, cv.CV_8UC4);
+// // let dst = new cv.Mat(video2.height, video2.width, cv.CV_8UC1);
+// let cap = new cv.VideoCapture(video);
+
+// const FPS = 22;
+
+// setInterval(() => {
+//     // cap.read(src);
+//     var type = "image/png"
+//     var data = document.getElementById("canvasOutput").toDataURL(type);
+//     data = data.replace('data:' + type + ';base64,', ''); //split off junk at the beginning
+//     socket.emit('image', data);
+// }, 10000/FPS);
+
+// socket.on('response_back', function(image){
+//     const image_id = document.getElementById('image');
+//     image_id.src = image;
+// });
 
 var video3 = document.querySelector("#videoElement3");
 
@@ -98,6 +145,9 @@ if (navigator.mediaDevices.getUserMedia) {
     });
 }
 
+
+
 </script>
+
 </body>
 </html>
