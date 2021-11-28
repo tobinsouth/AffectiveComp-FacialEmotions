@@ -12,7 +12,7 @@
 	border: 10px #333 solid;
     background-color: white;
 } */
-#videoElement {
+#trueSelf {
 	width: 100%;
 	height: 100%;
 	background-color: white;
@@ -30,7 +30,7 @@
 
 .column {
   float: left;
-  width: 33.33%;
+  width: 25%;
 }
 .row:after {
   content: "";
@@ -38,7 +38,12 @@
   clear: both;
 }
 
-.canvasOutput{
+.canvasForServer{
+  width: 100%;
+  height: 100%;
+}
+
+.canvasToClient{
   width: 100%;
   height: 100%;
 }
@@ -51,22 +56,32 @@
     <div class="row">
         <div class="column">
             <h3 class="mt-5">True Self</h3>
-            <video autoplay="true" id="videoElement">
+            <video autoplay="true" id="trueSelf">
             </video>
         </div>
 
 
         <div class="column">
-            <h3 class="mt-5">Modified Self</h3>
-            <!-- <video autoplay="true" id="videoElement2">
-            </video> -->
-            <canvas id="canvasOutput"></canvas>
-            <!-- <video autoplay="true" id="videoElement2"></video> -->
-            <div class = 'video'>
-                <img id="image">
-            </div>
-        </div>
+          <h3 class="mt-5">Modified Self Before</h3>
+          <canvas id="canvasForServer"></canvas>
+          <!-- <video autoplay="true" id="videoElement2"></video> -->
+          <!-- <div class = 'video'>
+              <img id="videofromservertoclient">
+          </div> -->
+          <!-- <h3 class="mt-5">Modified Self After</h3> -->
 
+        </div>
+        <div class="column">
+          <h3 class="mt-5">Modified Self After</h3>
+          <!-- <canvas id="canvasToClient"></canvas> -->
+          <img id="imageToClient">
+          <!-- <video autoplay="true" id="videoElement2"></video> -->
+          <!-- <div class = 'video'>
+              <img id="videofromservertoclient">
+          </div> -->
+          <!-- <h3 class="mt-5">Modified Self After</h3> -->
+
+        </div>
 
         <div class="column">
             <h3 class="mt-5">Received Other</h3>
@@ -77,11 +92,13 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-<script src="https://docs.opencv.org/master/opencv.js" type="text/javascript"></script>
+<!-- <script async src="https://docs.opencv.org/master/opencv.js" onload="OpenCvReady();"" type="text/javascript"></script> -->
+<!-- <script async src="opencv.js" onload="onOpenCvReady();" type="text/javascript"></script> -->
 <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
 
 
 <script type="text/javascript" charset="utf-8">
+
 
 $(document).ready(function() {
   namespace = '/test';
@@ -97,6 +114,7 @@ $(document).ready(function() {
       if (cb)
           cb();
   });
+
   $('form#emit').submit(function(event) {
       socket.emit('my_event', {data: $('#emit_data').val()});
       return false;
@@ -110,68 +128,112 @@ $(document).ready(function() {
       return false;
   });
 
-  let src = new cv.Mat(video2.height, video2.width, cv.CV_8UC4);
-  // let dst = new cv.Mat(video2.height, video2.width, cv.CV_8UC1);
-  let cap = new cv.VideoCapture(video);
-  const FPS = 22;
-  setInterval(() => {
-      // cap.read(src);
-      var type = "image/png"
-      var data = document.getElementById("canvasOutput").toDataURL(type);
-      data = data.replace('data:' + type + ';base64,', ''); //split off junk at the beginning
-      socket.emit('image', data);
-  }, 10000/FPS);
-  socket.on('response_back', function(image){
-      const image_id = document.getElementById('image');
-      image_id.src = image;
-  });
+  socket.on('sendbitmaptoclient', function(bitmapdata){
+    console.log("Server sent Client the manipulated bitmap");
+    // This works, super slow
+    const imageToClient = document.querySelector("#imageToClient")
+    imageToClient.src = bitmapdata.data
 
+    //Try out drawing on canvas and see if it's any faster
+    // console.log(bitmapdata.data.type)
+    // const canvastoclient = document.querySelector("#canvasToClient")
+    // canvastoclient.getContext('2d').drawImage(bitmapdata.data,0,0)
+    // canvastoclient.width =  1280;
+    // canvastoclient.height = 960;
+
+  });  
+
+  var video1 = document.querySelector("#trueSelf");
+
+  if (navigator.mediaDevices.getUserMedia) {
+
+    console.log("Reference to TrueSelf established")
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function (stream) {
+        video1.srcObject = stream;
+        const track = stream.getVideoTracks()[0];
+        imageCapture = new ImageCapture(track);
+
+        FPS = 15 // Changing this creates the lag effect
+        const canvasforserver = document.querySelector("#canvasForServer")
+        // canvasforserver.width =  640; Default dimensions
+        // canvasforserver.height = 480; Default dimensions
+        canvasforserver.width =  1280;
+        canvasforserver.height = 960;
+
+
+        setInterval(() => {
+          imageCapture.grabFrame().then((imageBitmap)=>{
+          // const image_id = document.getElementById('videofromservertoclient');
+          // image_id.src = imageBitmap;
+
+          canvasforserver.getContext('2d').drawImage(imageBitmap,0,0)
+          var type = "image/png"
+          var data = document.getElementById("canvasForServer").toDataURL(type);
+          // data = data.replace('data:' + type + ';base64,', ''); //split off junk at the beginning
+
+          // Send encoded image to Server
+          console.log("Client sending bitmap to server")
+          socket.emit('sendbitmaptoserver', data);
+          }).catch((error)=>{
+            console.log("Something went wrong in the imagecapture function!");
+          })
+        }, 10000/FPS);
+
+        // socket.emit('sendbitmaptoserver', {data: imageBitmap})
+        //   console.log("sent imagebitmap of trueself to server")
+        // }).catch( (error) => {
+        //   console.log("error in sending bitmap to server")
+        // }
+
+        // )
+      })
+      .catch(function (err0r) {
+        console.log("Something went wrong!");
+      });
+  }
+
+  var video3 = document.querySelector("#videoElement3");
+
+  if (navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function (stream) {
+        video3.srcObject = stream;
+      })
+      .catch(function (err0r) {
+        console.log("Something went wrong!");
+      });
+  }
+
+
+  // function OpenCvReady() {
+  //   console.log("fuck you opencv is ready")
+  //   // do all your work here
+  //   console.log("opencv is ready")
+    
+  //   let src = new cv.Mat(375, 500, cv.CV_8UC4);
+  //   let dst = new cv.Mat(375, 500, cv.CV_8UC1);
+  //   let cap = new cv.VideoCapture(videotoserver);
+
+  //   const FPS = 22;
+
+  //   setInterval(() => {
+  //       // cap.read(src);
+  //       var frame = capture()
+  //       var type = "image/png"
+  //       var data = document.getElementById("canvasOutput").toDataURL(type);
+  //       data = data.replace('data:' + type + ';base64,', ''); //split off junk at the beginning
+  //       socket.emit('my_event', {data: 'Ayo Server bro, I am a client sending you some video stream...'});
+  //       socket.emit('vid2ser', data);
+  //   }, 10000/FPS);
+  
+  // }
+  // socket.on('response_back', function(image){
+  //     const image_id = document.getElementById('videofromservertoclient');
+  //     image_id.src = image;
+  // });
 });
-
-
-
-
-
-
-
-var video1 = document.querySelector("#videoElement");
-
-if (navigator.mediaDevices.getUserMedia) {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video1.srcObject = stream;
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-}
-
-var video2 = document.querySelector("#videoElement2");
-
-if (navigator.mediaDevices.getUserMedia) {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video2.srcObject = stream;
-      video2.play()
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-}
-
-var video3 = document.querySelector("#videoElement3");
-
-if (navigator.mediaDevices.getUserMedia) {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video3.srcObject = stream;
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-}
-
-
 
 </script>
 

@@ -32,6 +32,8 @@ def index():
     else:        #in case we want to control through post requests
         return
 
+
+
 # def gen():
 #     while True:
 #         frame = fvc.read()
@@ -88,41 +90,64 @@ def disconnect_request():
          {'data': 'Disconnected!', 'count': session['receive_count']},
          callback=can_disconnect)
 
+@sio.on('sendbitmaptoserver', namespace='/test')
+def sendbitmaptoserver(data_image):
+    # do something with received client bitmap
 
-
-
-# async def print_message(sid, message):
-#     print("Socket ID: ", sid)
-#     print(message)
-
-# @sio.event
-# def connect(sid, environ, auth):
-#     print('connect ', sid)
-
-@sio.on('image')
-def image(data_image):
-    sbuf = StringIO()
-    sbuf.write(data_image)
+    # sbuf = StringIO()
+    # sbuf.write(data_image)
 
     # decode and convert into image
-    b = BytesIO(base64.b64decode(data_image))
-    pimg = Image.open(b)
+#     b = BytesIO(base64.b64decode(data_image))
+#     pimg = Image.open(b)
 
-    ## converting RGB to BGR, as opencv standards
-    frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
+# #     ## converting RGB to BGR, as opencv standards
+#     frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
 
-    # Process the image frame
-    frame = imutils.resize(frame, width=700)
-    frame = cv2.flip(frame, 1)
-    imgencode = cv2.imencode('.jpg', frame)[1]
+# #     # Process the image frame
+#     frame = imutils.resize(frame, width=700)
+#     frame = cv2.flip(frame, 1)
+#     imgencode = cv2.imencode('.jpg', frame)[1]
 
-    # base64 encode
-    stringData = base64.b64encode(imgencode).decode('utf-8')
-    b64_src = 'data:image/jpg;base64,'
-    stringData = b64_src + stringData
+#     # base64 encode
+    # stringData = base64.b64encode(data_image).decode('utf-8')
+    # b64_src = 'data:image/jpg;base64,'
+    # stringData = b64_src + stringData
 
-    # # emit the frame back
-    emit('response_back', stringData)
+
+    # send it back to client (origin)
+    emit('sendbitmaptoclient', 
+        {'data': data_image}
+    )
+
+    # send it back to the other client
+
+    
+
+# @sio.on('vid2ser', namespace='/test')
+# def image(data_image):
+#     sbuf = StringIO()
+#     sbuf.write(data_image)
+
+#     # decode and convert into image
+#     b = BytesIO(base64.b64decode(data_image))
+#     pimg = Image.open(b)
+
+#     ## converting RGB to BGR, as opencv standards
+#     frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
+
+#     # Process the image frame
+#     frame = imutils.resize(frame, width=700)
+#     frame = cv2.flip(frame, 1)
+#     imgencode = cv2.imencode('.jpg', frame)[1]
+
+#     # base64 encode
+#     stringData = base64.b64encode(imgencode).decode('utf-8')
+#     b64_src = 'data:image/jpg;base64,'
+#     stringData = b64_src + stringData
+
+#     # # emit the frame back
+#     emit('response_back', stringData)
 
 
 if __name__ == '__main__':
