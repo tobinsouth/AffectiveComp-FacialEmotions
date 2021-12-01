@@ -3,7 +3,7 @@ dash_extensions
 dash_core_components
 dash_bootstrap_components
 flask
-opencv-python
+python3-opencv
 imutils
 dlib
 gunicorn
