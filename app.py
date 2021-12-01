@@ -23,7 +23,9 @@ from helperFuncs import *
 class VideoCamera(object):
     """This object will store all of the information about the app as it progresses. It will use that information to generate the next frame."""
     def __init__(self):
+        print('Initializing VideoCamera')
         self.video = cv2.VideoCapture(0)
+        print('Success')
 
         # Variables for storing the current state of the emotions
         self.current_emotion = 'happy'
