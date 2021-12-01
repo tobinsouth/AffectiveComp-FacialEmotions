@@ -196,4 +196,4 @@ def update_face_and_text(emotion_value):
 
 # Running everything.
 if __name__ == '__main__':
-    app.run_server(debug=False, use_reloader=True)
+    app.run_server(debug=False, use_reloader=True, host='0.0.0.0', port=8050)
