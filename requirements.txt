@@ -1,0 +1,10 @@
+dash
+dash_extensions
+dash_core_components
+dash_bootstrap_components
+flask
+opencv-python==4.5.4.60
+imutils==0.5.3
+Dlib==19.21.1
+gunicorn==19.9.0
+requests
