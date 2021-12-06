@@ -87,12 +87,14 @@ def overlay_face(just_prev_face, just_prev_mask, frame, x, y, w, h):
 
     # Join frames
     not_face = cv2.bitwise_not(prev_mask_frame)
+    not_face = cv2.dilate(not_face, np.ones((5, 5)))
     faceless_frame = cv2.bitwise_and(frame, frame, mask=not_face)
     combined_frame = cv2.bitwise_or(faceless_frame,prev_face_frame)
 
 
     # TODO: We should try to feather / blur the edges of the face to make it seem more natural
     # NOTE: Maybe we could do this by eroding the underlying noface mask?
+    
 
     return combined_frame
 

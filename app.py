@@ -66,6 +66,7 @@ class VideoCamera(object):
                 just_prev_mask = mask[y:y+h, x:x+w]
                 self.faces[self.current_emotion] = (just_prev_face, just_prev_mask)  
                 self.progress_flag = False
+                print(self.current_emotion, self.emotion_index)
 
                 # Progress to next emotion
                 self.emotion_index += 1 
@@ -123,12 +124,12 @@ app.layout = html.Div([
     html.Div(id='collection_div', style = {'align-items': 'center', 'justify-content': 'center', 'width':'450pt'}, children=[
         html.Div("""This app will take snapshots of your face showing different emotions and then overlay them on the video feed later to hide your expression. To set this up you need to follow the instructions below and click the button to record each emotion."""),
         html.Div(dbc.Button('Next Step', id='progress_button', style={'width':'450pt', 'padding-top': '5pt', 'padding-bottom': '5pt'})),
-        dcc.Markdown(id='collection_text', highlight_config={'theme':'dark'}),
+        dcc.Markdown('##### Make a face that shows a **%s**  emotion.' % cameraObject.current_emotion, id='collection_text', highlight_config={'theme':'dark'}, ),
     ]),
 
-    html.Div(id='video_feed_container', children=html.Img(src="/video_feed"), style={'padding-top': '5pt', 'padding-bottom': '5pt'}),
+    html.Div(id='video_feed_container', children=html.Img(src="/video_feed", style={'width':'100%', 'align-items': 'center', 'justify-content': 'center'}), style={'padding-top': '5pt', 'padding-bottom': '5pt', 'width':'75%', 'align-items': 'center', 'justify-content': 'center', }),
 
-    html.Div(id='replacement_div', style={'display': 'none'}, children=[
+    html.Div(id='replacement_div', style={'display': 'none', 'display': 'block'}, children=[
         html.Div([
             html.Div(id='replacement_text'),
             dbc.RadioItems(
@@ -167,26 +168,37 @@ style={'width': '100%', 'height': '100%', 'display': 'flex', 'flex-direction': '
 # Collection callbacks
 @app.callback(Output('collection_div', 'style'), Input('progress_button', 'n_clicks'))
 def hide_collection_section(n_clicks):
-    if cameraObject.phase == 'collection':
-        cameraObject.progress_flag = True
+    print('n_clicks', n_clicks)
+    if n_clicks is not None:
+        if cameraObject.phase == 'collection':
+            cameraObject.progress_flag = True
+            raise PreventUpdate
+        elif cameraObject.phase == 'replacement':
+            return {'display': 'none'}
+    else:
         raise PreventUpdate
-    elif cameraObject.phase == 'replacement':
-        return {'display': 'none'}
 
 @app.callback(Output('replacement_div', 'style'), Input('progress_button', 'n_clicks'))
-def show_replacement_section(emotion_radio):
-    if cameraObject.phase == 'collection':
+def show_replacement_section(n_clicks):
+    if n_clicks is not None:
+        if cameraObject.phase == 'collection':
+            raise PreventUpdate
+        elif cameraObject.phase == 'replacement':
+            return {'display': 'block'}
+    else:
         raise PreventUpdate
-    elif cameraObject.phase == 'replacement':
-        return {'display': 'block'}
          
 
 @app.callback(Output('collection_text', 'children'), [Input('progress_button', 'n_clicks')])
 def update_collection_text(n_clicks):
-    if cameraObject.phase == 'collection':
-        return '##### Make a face that shows a **%s**  emotion.' % cameraObject.current_emotion
-    elif cameraObject.phase == 'replacement':
-        return '##### Click me one last time and you can change the emotions!'
+    if n_clicks is not None:
+        if cameraObject.emotion_index < len(cameraObject.emotions_list)-1:
+            return '##### Make a face that shows a **%s**  emotion.' % cameraObject.emotions_list[cameraObject.emotion_index+1]
+        else:
+            return '##### Click me one last time and you can change the emotions!'
+    else:
+        raise PreventUpdate
+
 
 # Replacement callbacks
 @app.callback(Output('replacement_text', 'children'), Input('emotion_radio', 'value'))
@@ -198,4 +210,4 @@ def update_face_and_text(emotion_value):
 
 # Running everything.
 if __name__ == '__main__':
-    app.run_server(debug=False, use_reloader=True, host='0.0.0.0', port=8050)
+    app.run_server(debug=True, use_reloader=True, host='0.0.0.0', port=8050)
