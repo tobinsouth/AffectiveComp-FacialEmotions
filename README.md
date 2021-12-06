@@ -2,7 +2,8 @@
 
 Turns out GANs are hard. OpenCV is less hard. Here is a bunch of code to build out an emotion demo product as a backup.
 
-Two key files currently:
-- `emotion_lag.py`: is a simple script that will add your current expression to a queue and display a lagged face simulating delayed communication.
-- `emotion_swap.py`: is a script that will swap your current expression with a set of pre-collected emotions provided by the user or an emoji. Designed to be an example of limited emotional expression range (or the use of a computer to show emotion).
+When running `app.py` it will create a localhost server that will allow the user to input faces for future use. At the end of collection the faces will then be overlayed depending on the emotion.
+
+
+Demo: Have two users self-record on their screens, then swap the screens and have them talk.
 
